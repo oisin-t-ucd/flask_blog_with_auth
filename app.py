@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import (
     LoginManager,
@@ -11,7 +12,6 @@ from flask_login import (
 )
 
 from models import BlogCategory, BlogPost, User, db
-from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
@@ -42,6 +42,12 @@ def load_user(user_id):
 # Create tables
 with app.app_context():
     db.create_all()
+    # Load default categories if there are none:
+    if BlogCategory.query.count() == 0:
+        default_categories = ["Personal", "Work", "Home", "Urgent"]
+        for name in default_categories:
+            db.session.add(BlogCategory(name=name))
+        db.session.commit()
 
 
 @app.route("/register", methods=["GET", "POST"])
