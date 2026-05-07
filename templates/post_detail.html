@@ -1,56 +1,100 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ post.title }} - Flask Blog{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}{{ post.title }} - Flask Blog{%
+endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title">{{ post.title }}</h1>
-                
-                {% if post.category %}
-                    <div class="category-badge">{{ post.category.name }}</div>
-                {% endif %}
-                
-                <div class="post-meta mb-4">
-                    <small>By <strong>{{ post.author.username }}</strong></small>
-                    <br>
-                    <small>Published on {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                    {% if post.updated_at != post.created_at %}
-                        <br>
-                        <small>Last updated on {{ post.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                    {% endif %}
-                </div>
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title">{{ post.title }}</h1>
 
-                <hr>
+        {% if post.category %}
+        <div class="category-badge">{{ post.category.name }}</div>
+        {% endif %}
 
-                <div class="blog-content mb-4">
-                    {{ post.content }}
-                </div>
-
-                <hr>
-
-                <div class="d-flex gap-2">
-                    <a href="{{ url_for('view_posts') }}" class="btn btn-secondary">Back to Posts</a>
-                    {% if current_user.is_authenticated and current_user.id == post.author_id %}
-                        <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-warning">Edit</a>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="post-meta mb-4">
+          <small>By <strong>{{ post.author.username }}</strong></small>
+          <br />
+          <small
+            >Published on {{ post.created_at.strftime('%Y-%m-%d %H:%M')
+            }}</small
+          >
+          {% if post.updated_at != post.created_at %}
+          <br />
+          <small
+            >Last updated on {{ post.updated_at.strftime('%Y-%m-%d %H:%M')
+            }}</small
+          >
+          {% endif %}
         </div>
 
-        <!-- Comments Section Placeholder -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">About the Author</h5>
-                <p class="card-text">
-                    <strong>{{ post.author.username }}</strong>
-                    <br>
-                    <small class="text-muted">Member since {{ post.author.created_at.strftime('%Y-%m-%d') }}</small>
-                </p>
-            </div>
+        <hr />
+
+        <div class="blog-content mb-4">{{ post.content }}</div>
+
+        <hr />
+
+        <h3>Comments</h3>
+        <ul>
+          {% for comment in post.comments %}
+          <li>
+            <strong>{{ comment.author.username }}</strong> said:
+            <p>{{ comment.content }}</p>
+            <small>{{ comment.created_at.strftime('%Y-%m-%d-%H:%M') }}</small>
+            {% if current_user.is_authenticated and current_user.id ==
+            comment.author_id %}
+            <a
+              href="{{ url_for('edit_comment', comment_id=comment.id) }}"
+              class="btn btn-warning"
+              >Edit Comment</a
+            >
+            {% endif %}
+          </li>
+          {% else %}
+          <p>No comments yet. Be the first!</p>
+          {% endfor %}
+        </ul>
+
+        {% if current_user.is_authenticated %}
+        <form
+          action="{{ url_for('add_comment', post_id=post.id) }}"
+          method="POST"
+        >
+          <textarea
+            name="content"
+            required
+            placeholder="Leave a comment..."
+          ></textarea>
+          <button type="submit">Submit</button>
+        </form>
+        {% endif %}
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('view_posts') }}" class="btn btn-secondary"
+            >Back to Posts</a
+          >
+          {% if current_user.is_authenticated and current_user.id ==
+          post.author_id %}
+          <a
+            href="{{ url_for('edit_post', post_id=post.id) }}"
+            class="btn btn-warning"
+            >Edit</a
+          >
+          {% endif %}
         </div>
+      </div>
     </div>
+
+    <!-- Comments Section Placeholder -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">About the Author</h5>
+        <p class="card-text">
+          <strong>{{ post.author.username }}</strong>
+          <br />
+          <small class="text-muted"
+            >Member since {{ post.author.created_at.strftime('%Y-%m-%d-%H:%M')}}</small
+          >
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

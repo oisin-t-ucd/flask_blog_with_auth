@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit comment - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Edit comment</h2>
+                
+                <form method="POST">
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required>{{ comment.content }}</textarea>
+                    </div>
+
+                  
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update comment</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+                
+                    <form id="delete_form" method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" >
+                        <button type="submit" class="btn btn-danger">Delete comment</button>
+                    </form>
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,7 +11,7 @@ from flask_login import (
     logout_user,
 )
 
-from models import BlogCategory, BlogPost, User, db
+from models import BlogCategory, BlogComment, BlogPost, User, db
 
 load_dotenv()
 app = Flask(__name__)
@@ -43,7 +43,11 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
     # Load default categories if there are none:
-    if BlogCategory.query.count() == 0:
+    if BlogComment.query.count() == 0:
+        comment = BlogComment(content="test", author_id=1, post_id=1)
+        db.session.add(comment)
+        db.session.commit()
+    if BlogCategory.query.count() == 1:
         default_categories = ["Personal", "Work", "Home", "Urgent"]
         for name in default_categories:
             db.session.add(BlogCategory(name=name))
@@ -245,6 +249,9 @@ def view_posts():
 @app.route("/post/<int:post_id>")
 def view_post(post_id):
     post = BlogPost.query.get_or_404(post_id)
+    comments = BlogComment.query.filter_by(post_id=post_id).all()
+    print("comments:")
+    print(comments)
 
     # Check if post is published or if user is the author
     if not post.published:
@@ -338,6 +345,23 @@ def delete_post(post_id):
     return redirect(url_for("my_posts"))
 
 
+@app.route("/comment/<int:comment_id>/delete", methods=["POST"])
+@login_required
+def delete_comment(comment_id):
+    comment = BlogComment.query.get_or_404(comment_id)
+
+    # Check if user is the author
+    if comment.author_id != current_user.id:
+        flash("You do not have permission to delete this comment.", "danger")
+        return redirect(url_for("view_post", post_id=comment.post_id))
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Comment deleted successfully!", "success")
+    return redirect(url_for("my_posts"))
+
+
 @app.route("/my-posts")
 @login_required
 def my_posts():
@@ -366,6 +390,54 @@ def publish_post(post_id):
     status = "published" if post.published else "unpublished"
     flash(f"Post {status} successfully!", "success")
     return redirect(url_for("my_posts"))
+
+
+# COMMENT ROUTES
+
+
+@app.route("/post/<int:post_id>/comment", methods=["POST"])
+@login_required
+def add_comment(post_id):
+    post = BlogPost.query.get_or_404(post_id)
+    content = request.form.get("content")
+
+    if not content:
+        flash("Comment cannot be empty.")
+        return redirect(url_for("view_post", post_id=post.id))
+
+    comment = BlogComment(content=content, author=current_user, post=post)
+    db.session.add(comment)
+    db.session.commit()
+
+    flash("Comment added!")
+    return redirect(url_for("view_post", post_id=post.id))
+
+
+@app.route("/comment/<int:comment_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_comment(comment_id):
+    comment = BlogComment.query.get_or_404(comment_id)
+
+    # Check if user is the author
+    if comment.author_id != current_user.id:
+        flash("You do not have permission to edit this comment.", "danger")
+        return redirect(url_for("view_posts"))
+
+    if request.method == "POST":
+        content = request.form.get("content")
+
+        if not content:
+            flash("Content is required.", "danger")
+            return redirect(url_for("post_detail", post_id=post_id))
+
+        comment.content = content
+        comment.updated_at = datetime.utcnow()
+        db.session.commit()
+
+        flash("Comment updated successfully!", "success")
+        return redirect(url_for("view_post", post_id=comment.post_id))
+
+    return render_template("edit_comment.html", comment=comment)
 
 
 if __name__ == "__main__":
