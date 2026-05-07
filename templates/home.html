@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="mb-4">Welcome to Flask Blog</h1>
+        
+        {% if current_user.is_authenticated %}
+            <p class="lead">Hello, <strong>{{ current_user.username }}</strong>! Check out the latest published posts below.</p>
+        {% else %}
+            <p class="lead">Welcome to our blog community! Sign up or log in to start publishing your own posts.</p>
+        {% endif %}
+
+        <hr class="my-4">
+
+        {% if posts.items %}
+            <h3 class="mb-4">Latest Posts</h3>
+            
+            {% for post in posts.items %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ url_for('view_post', post_id=post.id) }}" class="text-decoration-none">
+                                {{ post.title }}
+                            </a>
+                        </h5>
+                        
+                        {% if post.category %}
+                            <div class="category-badge">{{ post.category.name }}</div>
+                        {% endif %}
+                        
+                        <p class="blog-post-excerpt">{{ post.content[:200] }}...</p>
+                        
+                        <div class="post-meta">
+                            <small>By <strong>{{ post.author.username }}</strong> on {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        
+                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-primary btn-sm mt-3">Read More</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if posts.pages > 1 %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if posts.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('home', page=posts.prev_num) }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in posts.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == posts.page %}
+                                    <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if posts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('home', page=posts.next_num) }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info">
+                <h4>No posts yet</h4>
+                <p>There are no published posts yet. Check back soon!</p>
+            </div>
+        {% endif %}
+
+        {% if not current_user.is_authenticated %}
+            <div class="card bg-light mt-5">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Ready to write?</h5>
+                    <p class="card-text">Create an account to start publishing your blog posts.</p>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

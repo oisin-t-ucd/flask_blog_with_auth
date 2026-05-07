@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Blog Categories</h1>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('create_category') }}" class="btn btn-primary">+ New Category</a>
+            {% endif %}
+        </div>
+
+        {% if categories.items %}
+            <div class="row">
+                {% for category in categories.items %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ category.name }}</h5>
+                                <p class="card-text">{{ category.description or 'No description' }}</p>
+                                <p class="text-muted small">
+                                    {{ category.posts|length }} post{{ 's' if category.posts|length != 1 else '' }}
+                                </p>
+                                
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('view_posts', category_id=category.id) }}" class="btn btn-sm btn-info">View Posts</a>
+                                    {% if current_user.is_authenticated %}
+                                        <a href="{{ url_for('edit_category', category_id=category.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if categories.pages > 1 %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if categories.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('view_categories', page=categories.prev_num) }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in categories.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == categories.page %}
+                                    <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('view_categories', page=page_num) }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if categories.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('view_categories', page=categories.next_num) }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info">
+                <h4>No categories yet</h4>
+                <p>No categories have been created yet.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('create_category') }}" class="btn btn-primary mt-3">Create First Category</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}My Posts - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>My Blog Posts</h1>
+            <a href="{{ url_for('create_post') }}" class="btn btn-primary">+ New Post</a>
+        </div>
+
+        {% if posts.items %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts.items %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_post', post_id=post.id) }}">
+                                    {{ post.title }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if post.category %}
+                                    <span class="category-badge">{{ post.category.name }}</span>
+                                {% else %}
+                                    <span class="text-muted">--</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if post.published %}
+                                    <span class="published-badge">Published</span>
+                                {% else %}
+                                    <span class="draft-badge">Draft</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ post.created_at.strftime('%Y-%m-%d') }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="POST" action="{{ url_for('publish_post', post_id=post.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm {% if post.published %}btn-secondary{% else %}btn-success{% endif %}">
+                                            {% if post.published %}Unpublish{% else %}Publish{% endif %}
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            {% if posts.pages > 1 %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if posts.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('my_posts', page=posts.prev_num) }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in posts.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == posts.page %}
+                                    <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('my_posts', page=page_num) }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if posts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('my_posts', page=posts.next_num) }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info">
+                <h4>No posts yet</h4>
+                <p>You haven't created any blog posts yet.</p>
+                <a href="{{ url_for('create_post') }}" class="btn btn-primary mt-3">Create Your First Post</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

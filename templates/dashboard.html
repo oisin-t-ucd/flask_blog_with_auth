@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="mb-4">Dashboard</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Posts</h5>
+                        <h2 class="card-text text-primary">{{ total_posts }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Published</h5>
+                        <h2 class="card-text text-success">{{ published_posts }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Categories</h5>
+                        <h2 class="card-text text-info">{{ categories|length }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <a href="{{ url_for('create_post') }}" class="btn btn-success w-100">
+                    ✏️ Create New Post
+                </a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <a href="{{ url_for('my_posts') }}" class="btn btn-info w-100">
+                    📋 View My Posts
+                </a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <a href="{{ url_for('create_category') }}" class="btn btn-warning w-100">
+                    🏷️ Create Category
+                </a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <a href="{{ url_for('view_categories') }}" class="btn btn-secondary w-100">
+                    📂 All Categories
+                </a>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h3 class="mb-3">Quick Actions</h3>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Welcome, {{ user.username }}!</h5>
+                <p class="card-text">You have {{ total_posts }} posts with {{ published_posts }} published.</p>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('create_post') }}">Create a new blog post</a></li>
+                    <li><a href="{{ url_for('my_posts') }}">View and manage your posts</a></li>
+                    <li><a href="{{ url_for('create_category') }}">Create a new category</a></li>
+                    <li><a href="{{ url_for('view_posts') }}">View all published posts</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

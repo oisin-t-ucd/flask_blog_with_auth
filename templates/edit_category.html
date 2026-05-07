@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Category - Flask Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Edit Category</h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ category.name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4">{{ category.description or '' }}</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('view_categories') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <form method="POST" action="{{ url_for('delete_category', category_id=category.id) }}" onsubmit="return confirm('Are you sure you want to delete this category? All posts in this category will also be deleted.');">
+                    <button type="submit" class="btn btn-danger">Delete Category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
