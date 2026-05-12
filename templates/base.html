@@ -143,6 +143,33 @@
     <footer>
         <div class="container">
             <p>&copy; 2026 Flask Blog. All rights reserved.</p>
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Subscribe to our Newsletter</h5>
+                <form method="POST" action="{{ url_for('subscribe') }}">
+                    {{ subscribe_form.hidden_tag() }}
+                    <div class="input-group mb-3">
+                        {{ subscribe_form.email(class="form-control", placeholder="Enter email") }}
+                        <div class="input-group-append">
+                            {{ subscribe_form.submit(class="btn btn-outline-primary") }}
+                        </div>
+                    </div>
+                    {% if subscribe_form.email.errors %}
+                        {% for error in subscribe_form.email.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
+                </form>
+            </div>
+            <div class="col-md-6 text-right">
+                <p class="text-muted">&copy; 2024 Flask Blog</p>
+            </div>
+        </div>
+    </div>
+</footer>
         </div>
     </footer>
 

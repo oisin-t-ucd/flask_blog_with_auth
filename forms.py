@@ -16,7 +16,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from models import BlogCategory, User
+from models import BlogCategory, Subscriber, User
 
 
 class RegistrationForm(FlaskForm):
@@ -169,3 +169,13 @@ class EditCommentForm(FlaskForm):
         ],
     )
     submit = SubmitField("Update Comment")
+
+
+class SubscribeForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Subscribe")
+
+    def validate_email(self, email):
+        subscriber = Subscriber.query.filter_by(email=email.data).first()
+        if subscriber:
+            raise ValidationError("This email is already subscribed.")

@@ -19,8 +19,9 @@ from forms import (
     EditCommentForm,
     LoginForm,
     RegistrationForm,
+    SubscribeForm,
 )
-from models import BlogCategory, BlogComment, BlogPost, User, db
+from models import BlogCategory, BlogComment, BlogPost, Subscriber, User, db
 
 load_dotenv()
 app = Flask(__name__)
@@ -52,8 +53,31 @@ def load_user(user_id):
 
 # Create tables
 with app.app_context():
-    db.drop_all()  # uncomment this to reset the database when you next start the server
-    # db.create_all()
+    # db.drop_all() # uncomment this to reset the database when you next start the server
+    db.create_all()
+
+
+@app.context_processor
+def inject_subscribe_form():
+    return dict(subscribe_form=SubscribeForm())
+
+
+@app.route("/subscribe", methods=["POST"])
+def subscribe():
+    form = SubscribeForm()
+    if form.validate_on_submit():
+        subscriber = Subscriber(email=form.email.data)
+        db.session.add(subscriber)
+        db.session.commit()
+        flash("Thanks for subscribing!", "success")
+    else:
+        # If there are errors (like an invalid or duplicate email)
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error: {error}", "danger")
+
+    # Redirect back to the page the user was on
+    return redirect(request.referrer or url_for("home"))
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -404,20 +428,19 @@ def edit_comment(comment_id):
 @app.cli.command("reset-db")
 def reset_db():
     """Drops and creates all tables. This is a destructive operation."""
-    from sqlalchemy import text
-    
+
     # Optional: Ensure we are in app context
     db.drop_all()
     db.create_all()
-    
-    # If using Flask-Migrate, we usually need to 'stamp' it 
+
+    # If using Flask-Migrate, we usually need to 'stamp' it
     # so Alembic knows we are at the latest version.
     from flask_migrate import stamp
+
     stamp()
-    
+
     print("Database has been reset!")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
