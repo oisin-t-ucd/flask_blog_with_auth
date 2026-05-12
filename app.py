@@ -10,6 +10,7 @@ from flask_login import (
     login_user,
     logout_user,
 )
+from flask_migrate import Migrate
 
 from forms import (
     BlogCategoryForm,
@@ -24,6 +25,7 @@ from models import BlogCategory, BlogComment, BlogPost, User, db
 load_dotenv()
 app = Flask(__name__)
 
+
 # Configuration
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -34,7 +36,7 @@ app.config["WTF_CSRF_ENABLED"] = True
 
 # Initialize database
 db.init_app(app)
-
+migrate = Migrate(app, db)
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -50,8 +52,8 @@ def load_user(user_id):
 
 # Create tables
 with app.app_context():
-    # db.drop_all() uncomment this to reset the database when you next start the server
-    db.create_all()
+    db.drop_all()  # uncomment this to reset the database when you next start the server
+    # db.create_all()
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -399,5 +401,23 @@ def edit_comment(comment_id):
     return render_template("edit_comment.html", comment=comment, form=form)
 
 
+@app.cli.command("reset-db")
+def reset_db():
+    """Drops and creates all tables. This is a destructive operation."""
+    from sqlalchemy import text
+    
+    # Optional: Ensure we are in app context
+    db.drop_all()
+    db.create_all()
+    
+    # If using Flask-Migrate, we usually need to 'stamp' it 
+    # so Alembic knows we are at the latest version.
+    from flask_migrate import stamp
+    stamp()
+    
+    print("Database has been reset!")
+
 if __name__ == "__main__":
     app.run(debug=True)
+
+
