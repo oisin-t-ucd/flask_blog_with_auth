@@ -25,6 +25,19 @@
                             {{ form.title(class="form-control") }}
                         {% endif %}
                     </div>
+                    <div class="mb-3">
+                        {{ form.status.label(class="form-label") }}
+                        {% if form.status.errors %}
+                            {{ form.status(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.status.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.status(class="form-control") }}
+                        {% endif %}
+                    </div>
 
                     <div class="mb-3">
                         {{ form.content.label(class="form-label") }}

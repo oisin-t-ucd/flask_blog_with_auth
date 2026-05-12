@@ -86,6 +86,15 @@ class BlogPostForm(FlaskForm):
             ),
         ],
     )
+    status = StringField(
+        "Status",
+        validators=[
+            DataRequired(message="Status is required."),
+            Length(
+                min=5, max=20, message="Status must be between 5 and 200 characters."
+            ),
+        ],
+    )
     content = TextAreaField(
         "Content",
         validators=[

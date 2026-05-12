@@ -51,10 +51,11 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# This is not required when using flask-migrate:
 # Create tables
-with app.app_context():
-    # db.drop_all() # uncomment this to reset the database when you next start the server
-    db.create_all()
+# with app.app_context():
+# db.drop_all() # uncomment this to reset the database when you next start the server
+# db.create_all()
 
 
 @app.context_processor
@@ -266,6 +267,7 @@ def create_post():
         category_id = form.category_id.data if form.category_id.data != 0 else None
         post = BlogPost(
             title=form.title.data,
+            status=form.status.data,
             content=form.content.data,
             category_id=category_id,
             author_id=current_user.id,

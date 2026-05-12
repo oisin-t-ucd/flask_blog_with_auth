@@ -5,7 +5,7 @@ endblock %} {% block content %}
     <div class="card">
       <div class="card-body">
         <h1 class="card-title">{{ post.title }}</h1>
-
+        <h2>STATUS: {{ post.status }}</h2>
         {% if post.category %}
         <div class="category-badge">{{ post.category.name }}</div>
         {% endif %}
