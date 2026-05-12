@@ -9,25 +9,43 @@
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Login</h2>
                 
-                <form method="POST">
+                <form method="POST" novalidate>
+                    {{ form.csrf_token() }}
+                    
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        {{ form.username.label(class="form-label") }}
+                        {% if form.username.errors %}
+                            {{ form.username(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.username.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.username(class="form-control") }}
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        {{ form.password.label(class="form-label") }}
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control") }}
+                        {% endif %}
                     </div>
 
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">
-                            Remember me
-                        </label>
+                        {{ form.remember(class="form-check-input") }}
+                        {{ form.remember.label(class="form-check-label") }}
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    {{ form.submit(class="btn btn-primary w-100") }}
                 </form>
 
                 <hr class="my-3">

@@ -57,13 +57,23 @@ endblock %} {% block content %}
         <form
           action="{{ url_for('add_comment', post_id=post.id) }}"
           method="POST"
+          novalidate
         >
-          <textarea
-            name="content"
-            required
-            placeholder="Leave a comment..."
-          ></textarea>
-          <button type="submit">Submit</button>
+          {{ form.csrf_token() }}
+          <div class="mb-3">
+            {{ form.content.label("Comment") }}
+            {% if form.content.errors %}
+              {{ form.content(class="form-control is-invalid", placeholder="Leave a comment...") }}
+              <div class="invalid-feedback d-block">
+                {% for error in form.content.errors %}
+                  {{ error }}<br>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.content(class="form-control", placeholder="Leave a comment...") }}
+            {% endif %}
+          </div>
+          {{ form.submit(class="btn btn-primary") }}
         </form>
         {% endif %}
         <div class="d-flex gap-2">

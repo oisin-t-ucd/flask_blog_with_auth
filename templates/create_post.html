@@ -9,38 +9,60 @@
             <div class="card-body">
                 <h2 class="card-title mb-4">Create New Post</h2>
                 
-                <form method="POST">
+                <form method="POST" novalidate>
+                    {{ form.csrf_token() }}
+                    
                     <div class="mb-3">
-                        <label for="title" class="form-label">Post Title</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
+                        {{ form.title.label(class="form-label") }}
+                        {% if form.title.errors %}
+                            {{ form.title(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.title.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.title(class="form-control") }}
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        <label for="content" class="form-label">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        {{ form.content.label(class="form-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows="10") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.content.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows="10") }}
+                        {% endif %}
                         <small class="form-text text-muted">Write your blog post content here</small>
                     </div>
 
                     <div class="mb-3">
-                        <label for="category_id" class="form-label">Category</label>
-                        <select class="form-control" id="category_id" name="category_id">
-                            <option value="">-- Select a Category --</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
+                        {{ form.category_id.label(class="form-label") }}
+                        {% if form.category_id.errors %}
+                            {{ form.category_id(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.category_id.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.category_id(class="form-control") }}
+                        {% endif %}
                     </div>
 
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="published" name="published">
-                        <label class="form-check-label" for="published">
-                            Publish this post (make it visible to all users)
-                        </label>
+                        {{ form.published(class="form-check-input") }}
+                        {{ form.published.label(class="form-check-label") }}
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <a href="{{ url_for('my_posts') }}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Create Post</button>
+                        {{ form.submit(class="btn btn-primary") }}
                     </div>
                 </form>
             </div>

@@ -9,27 +9,35 @@
             <div class="card-body">
                 <h2 class="card-title mb-4">Edit comment</h2>
                 
-                <form method="POST">
+                <form method="POST" novalidate>
+                    {{ form.csrf_token() }}
                     
                     <div class="mb-3">
-                        <label for="content" class="form-label">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="10" required>{{ comment.content }}</textarea>
+                        {{ form.content.label(class="form-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows="10") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.content.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows="10") }}
+                        {% endif %}
                     </div>
 
-                  
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('edit_comment', comment_id=comment.id) }}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Update comment</button>
+                        <a href="{{ url_for('view_post', post_id=comment.post_id) }}" class="btn btn-secondary">Cancel</a>
+                        {{ form.submit(class="btn btn-primary") }}
                     </div>
                 </form>
 
                 <hr class="my-4">
                 
-                    <form id="delete_form" method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" >
-                        <button type="submit" class="btn btn-danger">Delete comment</button>
-                    </form>
-                    
-                
+                <form id="delete_form" method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" >
+                    {{ form.csrf_token() }}
+                    <button type="submit" class="btn btn-danger">Delete comment</button>
+                </form>
             </div>
         </div>
     </div>
